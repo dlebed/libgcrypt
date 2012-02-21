@@ -1647,6 +1647,14 @@ Associated Data (AEAD) block cipher mode, which is specified in
 Poly1305 is an Authenticated Encryption with Associated Data (AEAD)
 mode, which can be used with ChaCha20 and Salsa20 stream ciphers.
 
+@item GCRY_CIPHER_MODE_OFBGOST
+@cindex OFBGOST, Output Feedback mode from GOST 28147-89
+GOST 28147-89 declares a special variant of OFB mode. In the original
+text it is called 'gammirovanie'. In RFC-5830 it is called 'counter
+encryption' mode. Internally it looks like plain OFB with small
+additional transmutation on cryptostream. This mode may be used
+with any 64 bit block length algorithm.
+
 @end table
 
 @node Working with cipher handles
