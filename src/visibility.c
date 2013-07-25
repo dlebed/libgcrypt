@@ -704,6 +704,24 @@ gcry_cipher_setiv (gcry_cipher_hd_t hd, const void *iv, size_t ivlen)
   return _gcry_cipher_setiv (hd, iv, ivlen);
 }
 
+gcry_error_t
+gcry_cipher_tag (gcry_cipher_hd_t hd, void *out, size_t outsize)
+{
+  if (!fips_is_operational ())
+    return gpg_error (fips_not_operational ());
+
+  return _gcry_cipher_tag (hd, out, outsize);
+}
+
+gcry_error_t
+gcry_cipher_authenticate (gcry_cipher_hd_t hd, const void *aad, size_t aadsize)
+{
+  if (!fips_is_operational ())
+    return gpg_error (fips_not_operational ());
+
+  return _gcry_cipher_authenticate (hd, aad, aadsize);
+}
+
 gpg_error_t
 gcry_cipher_setctr (gcry_cipher_hd_t hd, const void *ctr, size_t ctrlen)
 {
