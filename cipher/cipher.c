@@ -381,6 +381,7 @@ gcry_cipher_open (gcry_cipher_hd_t *handle,
       case GCRY_CIPHER_MODE_OFB:
       case GCRY_CIPHER_MODE_CTR:
       case GCRY_CIPHER_MODE_AESWRAP:
+      case GCRY_CIPHER_MODE_GCM:
 	if (!spec->encrypt || !spec->decrypt)
 	  err = GPG_ERR_INV_CIPHER_MODE;
 	break;
@@ -573,6 +574,13 @@ cipher_setkey (gcry_cipher_hd_t c, byte *key, unsigned int keylen)
 static void
 cipher_setiv (gcry_cipher_hd_t c, const byte *iv, unsigned ivlen)
 {
+  /* GCM has its own IV handler */
+  if (c->mode == GCRY_CIPHER_MODE_GCM)
+    {
+      _gcry_cipher_gcm_setiv (c, iv, ivlen);
+      return;
+    }
+
   /* If the cipher has its own IV handler, we use only this one.  This
      is currently used for stream ciphers requiring a nonce.  */
   if (c->spec->setiv)
@@ -613,6 +621,8 @@ cipher_reset (gcry_cipher_hd_t c)
   memset (c->u_iv.iv, 0, c->spec->blocksize);
   memset (c->lastiv, 0, c->spec->blocksize);
   memset (c->u_ctr.ctr, 0, c->spec->blocksize);
+  memset (c->u_tag.tag, 0, c->spec->blocksize);
+  memset (c->length, 0, c->spec->blocksize);
 }
 
 
@@ -718,6 +728,11 @@ cipher_encrypt (gcry_cipher_hd_t c, byte *outbuf, unsigned int outbuflen,
                                          inbuf, inbuflen);
       break;
 
+    case GCRY_CIPHER_MODE_GCM:
+      rc = _gcry_cipher_gcm_encrypt (c, outbuf, outbuflen,
+                                         inbuf, inbuflen);
+      break;
+
     case GCRY_CIPHER_MODE_STREAM:
       c->spec->stencrypt (&c->context.c,
                           outbuf, (byte*)/*arggg*/inbuf, inbuflen);
@@ -808,6 +823,11 @@ cipher_decrypt (gcry_cipher_hd_t c, byte *outbuf, unsigned int outbuflen,
 
     case GCRY_CIPHER_MODE_AESWRAP:
       rc = _gcry_cipher_aeswrap_decrypt (c, outbuf, outbuflen,
+                                         inbuf, inbuflen);
+      break;
+
+    case GCRY_CIPHER_MODE_GCM:
+      rc = _gcry_cipher_gcm_decrypt (c, outbuf, outbuflen,
                                          inbuf, inbuflen);
       break;
 
@@ -914,6 +934,11 @@ gcry_error_t
 _gcry_cipher_authenticate (gcry_cipher_hd_t hd,
                            const void *aad, size_t aadsize)
 {
+  if (hd->mode == GCRY_CIPHER_MODE_GCM)
+    {
+      return gpg_error (_gcry_cipher_gcm_authenticate (hd, aad, aadsize));
+    }
+
   log_fatal ("gcry_cipher_tag: invalid mode %d\n", hd->mode );
   return gpg_error (GPG_ERR_INV_CIPHER_MODE);
 }
@@ -921,6 +946,11 @@ _gcry_cipher_authenticate (gcry_cipher_hd_t hd,
 gcry_error_t
 _gcry_cipher_tag (gcry_cipher_hd_t hd, void *out, size_t outsize)
 {
+  if (hd->mode == GCRY_CIPHER_MODE_GCM)
+    {
+      return gpg_error (_gcry_cipher_gcm_tag (hd, out, outsize));
+    }
+
   log_fatal ("gcry_cipher_tag: invalid mode %d\n", hd->mode );
   return gpg_error (GPG_ERR_INV_CIPHER_MODE);
 }

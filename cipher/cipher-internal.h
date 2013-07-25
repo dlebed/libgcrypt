@@ -96,6 +96,7 @@ struct gcry_cipher_handle
   struct {
     unsigned int key:1; /* Set to 1 if a key has been set.  */
     unsigned int iv:1;  /* Set to 1 if a IV has been set.  */
+    unsigned int tag:1; /* Set to 1 if a tag is finalized. */
   } marks;
 
   /* The initialization vector.  For best performance we make sure
@@ -113,9 +114,16 @@ struct gcry_cipher_handle
     unsigned char ctr[MAX_BLOCKSIZE];
   } u_ctr;
 
+  /* The interim tag for GCM mode.  */
+  union {
+    cipher_context_alignment_t iv_align;
+    unsigned char tag[MAX_BLOCKSIZE];
+  } u_tag;
+
   /* Space to save an IV or CTR for chaining operations.  */
   unsigned char lastiv[MAX_BLOCKSIZE];
   int unused;  /* Number of unused bytes in LASTIV. */
+  unsigned char length[MAX_BLOCKSIZE]; /* bit counters for GCM */
 
   /* What follows are two contexts of the cipher in use.  The first
      one needs to be aligned well enough for the cipher operation
@@ -174,6 +182,25 @@ gcry_err_code_t _gcry_cipher_aeswrap_decrypt
                    byte *outbuf, unsigned int outbuflen,
                    const byte *inbuf, unsigned int inbuflen);
 
+
+/*-- cipher-gcm.c --*/
+gcry_err_code_t _gcry_cipher_gcm_encrypt
+/*           */   (gcry_cipher_hd_t c,
+                   byte *outbuf, unsigned int outbuflen,
+                   const byte *inbuf, unsigned int inbuflen);
+gcry_err_code_t _gcry_cipher_gcm_decrypt
+/*           */   (gcry_cipher_hd_t c,
+                   byte *outbuf, unsigned int outbuflen,
+                   const byte *inbuf, unsigned int inbuflen);
+void _gcry_cipher_gcm_setiv
+/*           */   (gcry_cipher_hd_t c,
+                   const byte *iv, unsigned int ivlen);
+gcry_err_code_t _gcry_cipher_gcm_authenticate
+/*           */   (gcry_cipher_hd_t c,
+                   const byte *aadbuf, unsigned int aadbuflen);
+gcry_err_code_t _gcry_cipher_gcm_tag
+/*           */   (gcry_cipher_hd_t c,
+                   byte *outbuf, unsigned int outbuflen);
 
 
 #endif /*G10_CIPHER_INTERNAL_H*/

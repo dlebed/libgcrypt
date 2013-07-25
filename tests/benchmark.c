@@ -454,6 +454,7 @@ cipher_bench ( const char *algoname )
     { GCRY_CIPHER_MODE_CFB, "      CFB", 0 },
     { GCRY_CIPHER_MODE_OFB, "      OFB", 0 },
     { GCRY_CIPHER_MODE_CTR, "      CTR", 0 },
+    { GCRY_CIPHER_MODE_GCM, "      GCM", 0 },
     { GCRY_CIPHER_MODE_STREAM, "", 0 },
     {0}
   };
@@ -542,7 +543,9 @@ cipher_bench ( const char *algoname )
   for (modeidx=0; modes[modeidx].mode; modeidx++)
     {
       if ((blklen > 1 && modes[modeidx].mode == GCRY_CIPHER_MODE_STREAM)
-          | (blklen == 1 && modes[modeidx].mode != GCRY_CIPHER_MODE_STREAM))
+          || (blklen == 1 && modes[modeidx].mode != GCRY_CIPHER_MODE_STREAM)
+          || (blklen != GCRY_GCM_BLOCK_LEN && modes[modeidx].mode ==
+                              GCRY_CIPHER_MODE_GCM))
         continue;
 
       for (i=0; i < sizeof buf; i++)
