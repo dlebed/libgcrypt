@@ -35,6 +35,9 @@
 # define NEED_16BYTE_ALIGNED_CONTEXT 1
 #endif
 
+/* Undef this symbol to trade GCM speed for 256 bytes of memory per context */
+#define GCM_USE_TABLES 1
+
 
 /* A VIA processor with the Padlock engine as well as the Intel AES_NI
    instructions require an alignment of most data on a 16 byte
@@ -124,6 +127,9 @@ struct gcry_cipher_handle
   unsigned char lastiv[MAX_BLOCKSIZE];
   int unused;  /* Number of unused bytes in LASTIV. */
   unsigned char length[MAX_BLOCKSIZE]; /* bit counters for GCM */
+#ifdef GCM_USE_TABLES
+  unsigned char gcm_table[16 * 16]; /* pre-calculated table for GCM */
+#endif
 
   /* What follows are two contexts of the cipher in use.  The first
      one needs to be aligned well enough for the cipher operation

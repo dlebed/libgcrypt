@@ -2781,18 +2781,14 @@ check_cipher_modes(void)
   if (verbose)
     fprintf (stderr, "Starting Cipher Mode checks.\n");
 
-#if 0
   check_aes128_cbc_cts_cipher ();
   check_cbc_mac_cipher ();
   check_ctr_cipher ();
   check_cfb_cipher ();
   check_ofb_cipher ();
-#endif
   check_gcm_cipher ();
-#if 0
   check_stream_cipher ();
   check_stream_cipher_large_block ();
-#endif
 
   if (verbose)
     fprintf (stderr, "Completed Cipher Mode checks.\n");
@@ -4556,14 +4552,12 @@ main (int argc, char **argv)
     check_pubkey ();
   else if (!selftest_only)
     {
-//      check_ciphers ();
+      check_ciphers ();
       check_cipher_modes ();
-#if 0
       check_bulk_cipher_modes ();
       check_digests ();
       check_hmac ();
       check_pubkey ();
-#endif
     }
 
 
