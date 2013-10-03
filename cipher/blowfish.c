@@ -50,11 +50,11 @@
 # define USE_AMD64_ASM 1
 #endif
 
-/* USE_ARMV6_ASM indicates whether to use ARMv6 assembly code. */
-#undef USE_ARMV6_ASM
-#if defined(HAVE_ARM_ARCH_V6) && defined(__ARMEL__)
+/* USE_ARM_ASM indicates whether to use ARMv6 assembly code. */
+#undef USE_ARM_ASM
+#if defined(__ARMEL__)
 # if (BLOWFISH_ROUNDS == 16) && defined(HAVE_COMPATIBLE_GCC_ARM_PLATFORM_AS)
-#  define USE_ARMV6_ASM 1
+#  define USE_ARM_ASM 1
 # endif
 #endif
 
@@ -314,7 +314,7 @@ decrypt_block (void *context, byte *outbuf, const byte *inbuf)
   return /*burn_stack*/ (2*8);
 }
 
-#elif defined(USE_ARMV6_ASM)
+#elif defined(USE_ARM_ASM)
 
 /* Assembly implementations of Blowfish. */
 extern void _gcry_blowfish_armv6_do_encrypt(BLOWFISH_context *c, u32 *ret_xl,
@@ -370,7 +370,7 @@ decrypt_block (void *context, byte *outbuf, const byte *inbuf)
   return /*burn_stack*/ (10*4);
 }
 
-#else /*USE_ARMV6_ASM*/
+#else /*USE_ARM_ASM*/
 
 #if BLOWFISH_ROUNDS != 16
 static inline u32
@@ -580,7 +580,7 @@ decrypt_block (void *context, byte *outbuf, const byte *inbuf)
   return /*burn_stack*/ (64);
 }
 
-#endif /*!USE_AMD64_ASM&&!USE_ARMV6_ASM*/
+#endif /*!USE_AMD64_ASM&&!USE_ARM_ASM*/
 
 
 /* Bulk encryption of complete blocks in CTR mode.  This function is only
@@ -615,7 +615,7 @@ _gcry_blowfish_ctr_enc(void *context, unsigned char *ctr, void *outbuf_arg,
     /* Use generic code to handle smaller chunks... */
     /* TODO: use caching instead? */
   }
-#elif defined(USE_ARMV6_ASM)
+#elif defined(USE_ARM_ASM)
   {
     /* Process data in 2 block chunks. */
     while (nblocks >= 2)
@@ -683,7 +683,7 @@ _gcry_blowfish_cbc_dec(void *context, unsigned char *iv, void *outbuf_arg,
 
     /* Use generic code to handle smaller chunks... */
   }
-#elif defined(USE_ARMV6_ASM)
+#elif defined(USE_ARM_ASM)
   {
     /* Process data in 2 block chunks. */
     while (nblocks >= 2)
@@ -746,7 +746,7 @@ _gcry_blowfish_cfb_dec(void *context, unsigned char *iv, void *outbuf_arg,
 
     /* Use generic code to handle smaller chunks... */
   }
-#elif defined(USE_ARMV6_ASM)
+#elif defined(USE_ARM_ASM)
   {
     /* Process data in 2 block chunks. */
     while (nblocks >= 2)

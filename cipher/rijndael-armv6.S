@@ -20,7 +20,7 @@
 
 #include <config.h>
 
-#if defined(HAVE_ARM_ARCH_V6) && defined(__ARMEL__)
+#if defined(__ARMEL__)
 #ifdef HAVE_COMPATIBLE_GCC_ARM_PLATFORM_AS
 
 .text
@@ -850,4 +850,4 @@ _gcry_aes_armv6_decrypt_block:
 .long 0x745c6c48, 0x0000000c, 0x4257b8d0, 0x0000007d
 
 #endif /*HAVE_COMPATIBLE_GCC_AMD64_PLATFORM_AS*/
-#endif /*__ARM_ARCH >= 6*/
+#endif /*__ARMEL__ */

@@ -32,7 +32,7 @@
 #include <config.h>
 /* USE_ARMV6_ASM indicates whether to use ARMv6 assembly code. */
 # undef USE_ARMV6_ASM
-# if defined(HAVE_ARM_ARCH_V6) && defined(__ARMEL__)
+# if defined(__ARMEL__)
 #  ifdef HAVE_COMPATIBLE_GCC_ARM_PLATFORM_AS
 #   define USE_ARMV6_ASM 1
 #  endif
