@@ -231,7 +231,7 @@ _gcry_cipher_gcm_encrypt (gcry_cipher_hd_t c,
 {
   unsigned int n;
   int i;
-  unsigned int blocksize = c->cipher->blocksize;
+  unsigned int blocksize = c->spec->blocksize;
   unsigned char tmp[MAX_BLOCKSIZE];
 
   if (blocksize >= 0x20)
@@ -263,7 +263,7 @@ _gcry_cipher_gcm_encrypt (gcry_cipher_hd_t c,
       for ( ; c->length[i] == 0 && i > blocksize / 2; i --)
         c->length[i - 1]++;
 
-      c->cipher->encrypt (&c->context.c, tmp, c->u_ctr.ctr);
+      c->spec->encrypt (&c->context.c, tmp, c->u_ctr.ctr);
       if (n < blocksize)
         {
           buf_xor_2dst (outbuf, tmp, inbuf, n);
@@ -289,7 +289,7 @@ _gcry_cipher_gcm_decrypt (gcry_cipher_hd_t c,
 {
   unsigned int n;
   int i;
-  unsigned int blocksize = c->cipher->blocksize;
+  unsigned int blocksize = c->spec->blocksize;
   unsigned char tmp[MAX_BLOCKSIZE];
 
   if (blocksize >= 0x20)
@@ -329,7 +329,7 @@ _gcry_cipher_gcm_decrypt (gcry_cipher_hd_t c,
       for ( ; c->length[i] == 0 && i > blocksize / 2; i --)
         c->length[i - 1]++;
 
-      c->cipher->encrypt (&c->context.c, tmp, c->u_ctr.ctr);
+      c->spec->encrypt (&c->context.c, tmp, c->u_ctr.ctr);
 
       buf_xor (outbuf, inbuf, tmp, n);
 
@@ -347,7 +347,7 @@ _gcry_cipher_gcm_authenticate (gcry_cipher_hd_t c,
 {
   unsigned int n;
   int i;
-  unsigned int blocksize = c->cipher->blocksize;
+  unsigned int blocksize = c->spec->blocksize;
   unsigned char tmp[MAX_BLOCKSIZE];
 
   if (!c->marks.iv)
@@ -388,7 +388,7 @@ _gcry_cipher_gcm_setiv (gcry_cipher_hd_t c,
 {
   memset (c->length, 0, 16);
   memset (c->u_tag.tag, 0, 16);
-  c->cipher->encrypt ( &c->context.c, c->u_iv.iv, c->u_tag.tag );
+  c->spec->encrypt ( &c->context.c, c->u_iv.iv, c->u_tag.tag );
 
   fillM (c->u_iv.iv, c->gcm_table);
 
@@ -419,7 +419,7 @@ _gcry_cipher_gcm_setiv (gcry_cipher_hd_t c,
       c->u_ctr.ctr[15] = 1;
     }
 
-  c->cipher->encrypt ( &c->context.c, c->lastiv, c->u_ctr.ctr );
+  c->spec->encrypt ( &c->context.c, c->lastiv, c->u_ctr.ctr );
   c->marks.iv = 1;
 
 }
